@@ -1,5 +1,5 @@
-(load "mk.rkt")
-
+#lang racket
+(require "mk.rkt")
 
 ;; Interpreter implementing lexical scope
 

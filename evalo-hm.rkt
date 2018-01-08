@@ -1,3 +1,4 @@
+#lang racket
 (require "mk.rkt")
 
 (define closure-tag (gensym "#%closure"))

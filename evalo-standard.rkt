@@ -1,4 +1,5 @@
-(load "mk.rkt")
+#lang racket
+(require "mk.rkt")
 
 ;; The definition of 'letrec' is based based on Dan Friedman's code,
 ;; using the "half-closure" approach from Reynold's definitional

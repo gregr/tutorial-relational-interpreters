@@ -1,4 +1,5 @@
-(load "mk.rkt")
+#lang racket
+(require "mk.rkt")
 
 (define evalo
   (lambda (exp val)
