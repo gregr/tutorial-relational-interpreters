@@ -1,5 +1,5 @@
 #lang racket
-
+(provide (all-defined-out))
 (require "mk.rkt")
 
 ;(define (append l s)
