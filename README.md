@@ -8,6 +8,8 @@ Download Racket: https://download.racket-lang.org/
 
 ## Related material
 
+https://github.com/gregr/icfp2017-artifact-auas7pp
+
 https://dl.acm.org/ft_gateway.cfm?id=3110252
 
 http://minikanren.org/
