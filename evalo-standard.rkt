@@ -1,4 +1,5 @@
 #lang racket
+(provide (all-defined-out))
 (require "mk.rkt")
 
 ;; The definition of 'letrec' is based based on Dan Friedman's code,

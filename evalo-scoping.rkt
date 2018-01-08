@@ -1,4 +1,5 @@
 #lang racket
+(provide (all-defined-out))
 (require "mk.rkt")
 
 ;; Interpreter implementing lexical scope
