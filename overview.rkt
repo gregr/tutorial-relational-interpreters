@@ -54,12 +54,12 @@
       ((=/= y x) (lookupo x rest val)))))
 
 
-(define (not-in-env x env)
+(define ((not-in-env? env) x)
   (match env
     ('() #t)
     (`((,y . ,v) . ,rest)
       (and (not (eqv? y x))
-           (not-in-env x rest)))))
+           ((not-in-env? rest) x)))))
 
 (define (not-in-envo x env)
   (conde
@@ -68,9 +68,6 @@
        (== `((,y . ,v) . ,rest) env)
        (=/= y x)
        (not-in-envo x rest)))))
-
-
-(define closure-tag (gensym "closure"))
 
 
 (define (evaluate expr env)
@@ -84,82 +81,40 @@
       `(,(evaluate ea env) . ,(evaluate ed env)))
 
     (`(lambda (,(? symbol? x)) ,body)
-      `(,closure-tag ,x ,body ,env))
-
-    (`(,rator ,rand)
-      (match-let ((`(,closure-tag ,x ,body ,env^) (evaluate rator env))
-                  (arg (evaluate rand env)))
-        (evaluate body `((,x . ,arg) . ,env^))))))
-
-
-
-(define (evaluate expr env)
-  (define (unshadowed? name) (not-in-env name env))
-  (match expr
-    (`(quote ,v) v)
-
-    ((? symbol?)
-     (lookup expr env))
-
-    (`(,(? unshadowed? 'cons) ,ea ,ed)
-      `(,(evaluate ea env) . ,(evaluate ed env)))
-
-    (`(,(? unshadowed? 'lambda) (,(? symbol? x)) ,body)
-      `(,closure-tag ,x ,body ,env))
-
-    (`(,rator ,rand)
-      (match-let ((`(,closure-tag ,x ,body ,env^) (evaluate rator env))
-                  (arg (evaluate rand env)))
-        (evaluate body `((,x . ,arg) . ,env^))))))
-
-
-(define (evaluate expr env)
-  (define (unshadowed? name) (not-in-env name env))
-  (match expr
-    (`(quote ,v) v)
-
-    ((? symbol?)
-     (lookup expr env))
-
-    (`(,(? unshadowed? 'cons) ,ea ,ed)
-      `(,(evaluate ea env) . ,(evaluate ed env)))
-
-    (`(,(? unshadowed? 'lambda) (,(? symbol? x)) ,body)
-      `(,closure-tag ,x ,body ,env))
+      `(closure ,x ,body ,env))
 
     (`(,rator ,rand)
       (match (evaluate rator env)
-        (`(,closure-tag ,x ,body ,env^)
+        (`(closure ,x ,body ,env^)
           (let ((arg (evaluate rand env)))
             (evaluate body `((,x . ,arg) . ,env^))))))))
 
 
 (define (evaluate expr env)
-  (define (unshadowed? name) (not-in-env name env))
   (match expr
     (`(quote ,v) v)
 
     ((? symbol?)
      (lookup expr env))
 
-    (`(,(? unshadowed? 'cons) ,ea ,ed)
+    (`(,(? (not-in-env? env) 'cons) ,ea ,ed)
       `(,(evaluate ea env) . ,(evaluate ed env)))
 
-    (`(,(? unshadowed? 'lambda) (,(? symbol? x)) ,body)
-      `(,closure-tag ,x ,body ,env))
+    (`(,(? (not-in-env? env) 'lambda) (,(? symbol? x)) ,body)
+      `(closure ,x ,body ,env))
 
     (`(,rator ,rand)
       (match (evaluate rator env)
-        (`(,closure-tag ,x ,body ,env^)
-          (evaluate body `((,x . ,(evaluate rand env)) . ,env^)))))))
-
+        (`(closure ,x ,body ,env^)
+          (let ((arg (evaluate rand env)))
+            (evaluate body `((,x . ,arg) . ,env^))))))))
 
 
 (define (evaluateo expr env val)
   (conde
     ((== `(quote ,val) expr)
      (not-in-envo 'quote env)
-     (absento closure-tag val))
+     (absento 'closure val))
 
     ((symbolo expr)
      (lookupo expr env val))
@@ -167,20 +122,20 @@
     ((fresh (ea ed va vd)
        (== `(cons ,ea ,ed) expr)
        (== `(,va . ,vd) val)
-       (absento closure-tag val)
+       (absento 'closure val)
        (not-in-envo 'cons env)
        (evaluateo ea env va)
        (evaluateo ed env vd)))
 
     ((fresh (x body)
        (== `(lambda (,x) ,body) expr)
-       (== `(,closure-tag ,x ,body ,env) val)
+       (== `(closure ,x ,body ,env) val)
        (symbolo x)
        (not-in-envo 'lambda env)))
 
     ((fresh (rator rand arg x body env^)
        (== `(,rator ,rand) expr)
-       (evaluateo rator env `(,closure-tag ,x ,body ,env^))
+       (evaluateo rator env `(closure ,x ,body ,env^))
        (evaluateo rand env arg)
        (evaluateo body `((,x . ,arg) . ,env^) val)))))
 
