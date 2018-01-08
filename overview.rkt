@@ -77,7 +77,7 @@
     ((fresh (ea ed va vd)
        (== `(cons ,ea ,ed) expr)
        (== `(,va . ,vd) val)
-       (absento 'closure val)
+       (absento 'closure expr)
        (not-in-envo 'cons env)
        (evaluateo ea env va)
        (evaluateo ed env vd)))
