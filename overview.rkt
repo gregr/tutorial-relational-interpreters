@@ -90,25 +90,25 @@
             (evaluate body `((,x . ,arg) . ,env^))))))))
 
 
-(define (evaluate expr env)
-  (match expr
-    (`(,(? (not-in-env? env) quote) ,v)
-      v)
+;(define (evaluate expr env)
+  ;(match expr
+    ;(`(,(? (not-in-env? env) quote) ,v)
+      ;v)
 
-    ((? symbol?)
-     (lookup expr env))
+    ;((? symbol?)
+     ;(lookup expr env))
 
-    (`(,(? (not-in-env? env) 'cons) ,ea ,ed)
-      `(,(evaluate ea env) . ,(evaluate ed env)))
+    ;(`(,(? (not-in-env? env) 'cons) ,ea ,ed)
+      ;`(,(evaluate ea env) . ,(evaluate ed env)))
 
-    (`(,(? (not-in-env? env) 'lambda) (,(? symbol? x)) ,body)
-      `(closure ,x ,body ,env))
+    ;(`(,(? (not-in-env? env) 'lambda) (,(? symbol? x)) ,body)
+      ;`(closure ,x ,body ,env))
 
-    (`(,rator ,rand)
-      (match (evaluate rator env)
-        (`(closure ,x ,body ,env^)
-          (let ((arg (evaluate rand env)))
-            (evaluate body `((,x . ,arg) . ,env^))))))))
+    ;(`(,rator ,rand)
+      ;(match (evaluate rator env)
+        ;(`(closure ,x ,body ,env^)
+          ;(let ((arg (evaluate rand env)))
+            ;(evaluate body `((,x . ,arg) . ,env^))))))))
 
 
 (define (evaluateo expr env val)
