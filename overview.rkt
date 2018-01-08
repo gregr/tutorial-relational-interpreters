@@ -92,7 +92,8 @@
 
 (define (evaluate expr env)
   (match expr
-    (`(quote ,v) v)
+    (`(,(? (not-in-env? env) quote) ,v)
+      v)
 
     ((? symbol?)
      (lookup expr env))
