@@ -81,7 +81,7 @@
 ; conde it is assigned a new scope.
 
 ;; To allow use of optimizations that sacrifice completeness, set this to #t.
-(define allow-incomplete-search? #f)
+(define allow-incomplete-search? #t)
 
 ;; To allow use of experimental `conde1` optimization, set this to #t.
 (define enable-conde1? #t)
